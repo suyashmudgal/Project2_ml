@@ -183,12 +183,26 @@ function App() {
           onPixelClick={handlePixelClick}
           isCustomMode={selectedDatasetId === 'custom'}
         />
+
+        <div className="flow-arrow">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
         
         <CalculationDisplay 
           inputWindow={inputWindow} filter={selectedFilter}
           outputValue={currentOutputValue}
           hoveredCell={hoveredCell} setHoveredCell={setHoveredCell}
         />
+
+        <div className="flow-arrow">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </div>
         
         <OutputGrid 
           data={outputGrid} 

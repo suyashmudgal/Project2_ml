@@ -188,12 +188,28 @@ select:focus {
 .main-content {
   display: flex;
   gap: 2rem;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  width: 100%;
+  padding: 2rem 0;
+  overflow-x: auto;
 }
 
-/* Grids */
+.flow-arrow {
+  display: flex;
+  align-items: center;
+  color: var(--accent-color);
+  font-size: 2rem;
+  animation: pulse-flow 2s infinite;
+}
+
+@keyframes pulse-flow {
+  0% { opacity: 0.3; transform: scale(0.9) translateX(-5px); }
+  50% { opacity: 1; transform: scale(1.1) translateX(5px); filter: drop-shadow(0 0 10px var(--accent-color)); }
+  100% { opacity: 0.3; transform: scale(0.9) translateX(-5px); }
+}
+
 .grid-container {
   display: flex;
   flex-direction: column;
@@ -204,6 +220,7 @@ select:focus {
   border-radius: 1rem;
   border: 1px solid rgba(255,255,255,0.05);
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  min-width: 350px;
 }
 
 .grid-title {
