@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export function InputGrid({ data, currentStep, hoveredCell, setHoveredCell, stride, outCols, paddingAmount }) {
+export function InputGrid({ data, currentStep, hoveredCell, setHoveredCell, stride, outCols, paddingAmount, onPixelClick, isCustomMode }) {
+  const [isDrawing, setIsDrawing] = useState(false);
+
   if (!data || data.length === 0) return null;
   const rows = data.length;
   const cols = data[0].length;
@@ -23,15 +25,33 @@ export function InputGrid({ data, currentStep, hoveredCell, setHoveredCell, stri
   };
 
   const getIntensityColor = (val, isPad) => {
-    if (isPad) return 'rgba(0,0,0,0.5)'; // Darker for padding
+    if (isPad) return 'rgba(0,0,0,0.5)';
     const intensity = Math.floor(val * 255);
     return `rgb(${intensity}, ${intensity}, ${intensity})`;
   };
 
+  const handleMouseDown = (r, c) => {
+    if (isCustomMode) {
+      setIsDrawing(true);
+      onPixelClick(r, c);
+    }
+  };
+
+  const handleMouseEnter = (r, c) => {
+    if (isDrawing && isCustomMode) {
+      onPixelClick(r, c);
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDrawing(false);
+  };
+
   return (
-    <div className="grid-container">
+    <div className="grid-container" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
       <h3 className="grid-title">Input Image ({rows}x{cols})</h3>
-      <div className="pixel-grid" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      {isCustomMode && <div style={{color: 'var(--accent-color)', fontSize: '0.8rem', marginTop: '-1rem'}}>Click and drag to draw!</div>}
+      <div className="pixel-grid" style={{ gridTemplateColumns: `repeat(${cols}, 1fr)`, cursor: isCustomMode ? 'crosshair' : 'default' }}>
         {data.map((row, r) =>
           row.map((val, c) => {
             const inWindow = isInWindow(r, c);
@@ -47,6 +67,8 @@ export function InputGrid({ data, currentStep, hoveredCell, setHoveredCell, stri
                   border: isPad ? '1px dashed rgba(255,255,255,0.2)' : undefined 
                 }}
                 title={`Row: ${r}, Col: ${c}\nValue: ${val.toFixed(2)}${isPad ? ' (Padding)' : ''}`}
+                onMouseDown={() => handleMouseDown(r, c)}
+                onMouseEnter={() => handleMouseEnter(r, c)}
               >
                 {val.toFixed(1)}
               </div>

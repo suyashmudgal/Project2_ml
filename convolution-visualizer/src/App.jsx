@@ -10,26 +10,32 @@ function App() {
   const [selectedDatasetId, setSelectedDatasetId] = useState(datasets[0].id);
   const [selectedFilterId, setSelectedFilterId] = useState(filters[0].id);
   const [stride, setStride] = useState(1);
-  const [padding, setPadding] = useState('valid'); // 'valid' or 'same'
+  const [padding, setPadding] = useState('valid');
   
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   
-  // hoveredCell can be { type: 'input'|'output', row, col }
   const [hoveredCell, setHoveredCell] = useState(null);
+
+  // Custom drawing data state
+  const [customData, setCustomData] = useState(() => {
+    const blank = [];
+    for(let i=0; i<28; i++) blank.push(new Array(28).fill(0));
+    return blank;
+  });
 
   const appRef = useRef(null);
 
   const baseData = useMemo(() => {
+    if (selectedDatasetId === 'custom') return customData;
     return datasets.find(d => d.id === selectedDatasetId)?.data || datasets[0].data;
-  }, [selectedDatasetId]);
+  }, [selectedDatasetId, customData]);
 
   const selectedFilter = useMemo(() => {
     return filters.find(f => f.id === selectedFilterId)?.data || filters[0].data;
   }, [selectedFilterId]);
 
-  // Apply padding
   const paddingAmount = padding === 'same' ? 1 : 0;
   const selectedData = useMemo(() => {
     if (paddingAmount === 0) return baseData;
@@ -42,7 +48,7 @@ function App() {
         if (r >= 0 && r < baseRows && c >= 0 && c < baseCols) {
           row.push(baseData[r][c]);
         } else {
-          row.push(0); // Zero padding
+          row.push(0);
         }
       }
       padded.push(row);
@@ -57,7 +63,6 @@ function App() {
   const outCols = Math.floor((cols - filterSize) / stride) + 1;
   const maxSteps = outRows * outCols;
 
-  // Pre-calculate the entire output grid
   const outputGrid = useMemo(() => {
     const grid = [];
     for (let r = 0; r < outRows; r++) {
@@ -96,17 +101,14 @@ function App() {
     return () => clearInterval(interval);
   }, [isPlaying, maxSteps]);
 
-  // Reset when data, filter, stride, or padding changes
   useEffect(() => {
     setCurrentStep(0);
     setIsPlaying(false);
-  }, [selectedDatasetId, selectedFilterId, stride, padding]);
+  }, [selectedDatasetId, selectedFilterId, stride, padding, customData]);
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
-      appRef.current.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable fullscreen: ${err.message}`);
-      });
+      appRef.current.requestFullscreen().catch(err => console.error(err));
       setIsFullScreen(true);
     } else {
       document.exitFullscreen();
@@ -115,17 +117,28 @@ function App() {
   };
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
-    };
+    const handleFullscreenChange = () => setIsFullScreen(!!document.fullscreenElement);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
+  const handlePixelClick = (r, c) => {
+    if (selectedDatasetId !== 'custom') return;
+    // Account for padding when updating customData
+    const origR = r - paddingAmount;
+    const origC = c - paddingAmount;
+    if (origR < 0 || origR >= 28 || origC < 0 || origC >= 28) return; // clicked on padding
+    
+    setCustomData(prev => {
+      const newData = prev.map(row => [...row]);
+      newData[origR][origC] = newData[origR][origC] > 0.5 ? 0.0 : 1.0;
+      return newData;
+    });
+  };
+
   const windowRow = Math.floor(currentStep / outCols) * stride;
   const windowCol = (currentStep % outCols) * stride;
 
-  // Extract the current 3x3 input window
   const inputWindow = useMemo(() => {
     const win = [];
     for (let i = 0; i < filterSize; i++) {
@@ -151,52 +164,36 @@ function App() {
       </div>
 
       <Controls 
-        selectedDatasetId={selectedDatasetId}
-        setSelectedDatasetId={setSelectedDatasetId}
-        selectedFilterId={selectedFilterId}
-        setSelectedFilterId={setSelectedFilterId}
-        stride={stride}
-        setStride={setStride}
-        padding={padding}
-        setPadding={setPadding}
-        isPlaying={isPlaying}
-        togglePlay={() => setIsPlaying(!isPlaying)}
-        stepForward={() => {
-          setIsPlaying(false);
-          setCurrentStep(s => Math.min(s + 1, maxSteps - 1));
-        }}
-        reset={() => {
-          setIsPlaying(false);
-          setCurrentStep(0);
-        }}
-        isFullScreen={isFullScreen}
-        toggleFullScreen={toggleFullScreen}
+        selectedDatasetId={selectedDatasetId} setSelectedDatasetId={setSelectedDatasetId}
+        selectedFilterId={selectedFilterId} setSelectedFilterId={setSelectedFilterId}
+        stride={stride} setStride={setStride}
+        padding={padding} setPadding={setPadding}
+        isPlaying={isPlaying} togglePlay={() => setIsPlaying(!isPlaying)}
+        stepForward={() => { setIsPlaying(false); setCurrentStep(s => Math.min(s + 1, maxSteps - 1)); }}
+        reset={() => { setIsPlaying(false); setCurrentStep(0); }}
+        isFullScreen={isFullScreen} toggleFullScreen={toggleFullScreen}
       />
 
       <div className="main-content">
         <InputGrid 
           data={selectedData} 
           currentStep={currentStep} 
-          hoveredCell={hoveredCell}
-          setHoveredCell={setHoveredCell}
-          stride={stride}
-          outCols={outCols}
-          paddingAmount={paddingAmount}
+          hoveredCell={hoveredCell} setHoveredCell={setHoveredCell}
+          stride={stride} outCols={outCols} paddingAmount={paddingAmount}
+          onPixelClick={handlePixelClick}
+          isCustomMode={selectedDatasetId === 'custom'}
         />
         
         <CalculationDisplay 
-          inputWindow={inputWindow}
-          filter={selectedFilter}
+          inputWindow={inputWindow} filter={selectedFilter}
           outputValue={currentOutputValue}
-          hoveredCell={hoveredCell}
-          setHoveredCell={setHoveredCell}
+          hoveredCell={hoveredCell} setHoveredCell={setHoveredCell}
         />
         
         <OutputGrid 
           data={outputGrid} 
           currentStep={currentStep} 
-          hoveredCell={hoveredCell}
-          setHoveredCell={setHoveredCell}
+          hoveredCell={hoveredCell} setHoveredCell={setHoveredCell}
         />
       </div>
     </div>
