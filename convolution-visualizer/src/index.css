@@ -198,21 +198,30 @@ select:focus {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
+  background: rgba(30, 41, 59, 0.4);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 .grid-title {
   font-size: 1.125rem;
   color: var(--text-main);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .pixel-grid {
   display: grid;
-  gap: 1px;
-  background-color: var(--grid-border);
-  border: 1px solid var(--grid-border);
-  padding: 1px;
-  /* Sizes will be set inline based on grid dimensions */
+  gap: 2px;
+  background-color: var(--panel-bg);
+  border: 2px solid var(--grid-border);
+  padding: 2px;
+  border-radius: 4px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .pixel {
@@ -223,26 +232,32 @@ select:focus {
   justify-content: center;
   font-size: 6px;
   font-family: var(--font-mono);
-  color: transparent; /* hide text by default unless zoomed or hovered */
-  transition: all 0.1s;
+  color: transparent; 
+  transition: all 0.15s ease-in-out;
   cursor: crosshair;
   position: relative;
+  border-radius: 1px;
 }
 
 .pixel:hover {
   color: rgba(255,255,255,0.9);
   z-index: 10;
-  transform: scale(1.5);
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  transform: scale(2);
+  box-shadow: 0 0 15px rgba(0,0,0,0.8), 0 0 5px var(--accent-color);
   border-radius: 2px;
+  outline: 1px solid rgba(255,255,255,0.8);
 }
 
 .pixel.in-window {
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+  z-index: 1;
 }
 
 .pixel.active-window {
-  box-shadow: inset 0 0 0 1px var(--highlight-border);
+  box-shadow: inset 0 0 0 1px var(--highlight-border), 0 0 5px var(--highlight-border);
+  z-index: 5;
+  transform: scale(1.1);
 }
 
 /* Calculation Section */
