@@ -9,6 +9,8 @@ import { filters } from './data/filters';
 function App() {
   const [selectedDatasetId, setSelectedDatasetId] = useState(datasets[0].id);
   const [selectedFilterId, setSelectedFilterId] = useState(filters[0].id);
+  const [stride, setStride] = useState(1);
+  const [padding, setPadding] = useState('valid'); // 'valid' or 'same'
   
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -19,7 +21,7 @@ function App() {
 
   const appRef = useRef(null);
 
-  const selectedData = useMemo(() => {
+  const baseData = useMemo(() => {
     return datasets.find(d => d.id === selectedDatasetId)?.data || datasets[0].data;
   }, [selectedDatasetId]);
 
@@ -27,22 +29,46 @@ function App() {
     return filters.find(f => f.id === selectedFilterId)?.data || filters[0].data;
   }, [selectedFilterId]);
 
+  // Apply padding
+  const paddingAmount = padding === 'same' ? 1 : 0;
+  const selectedData = useMemo(() => {
+    if (paddingAmount === 0) return baseData;
+    const padded = [];
+    const baseRows = baseData.length;
+    const baseCols = baseData[0].length;
+    for (let r = -paddingAmount; r < baseRows + paddingAmount; r++) {
+      const row = [];
+      for (let c = -paddingAmount; c < baseCols + paddingAmount; c++) {
+        if (r >= 0 && r < baseRows && c >= 0 && c < baseCols) {
+          row.push(baseData[r][c]);
+        } else {
+          row.push(0); // Zero padding
+        }
+      }
+      padded.push(row);
+    }
+    return padded;
+  }, [baseData, paddingAmount]);
+
   const rows = selectedData.length;
   const cols = selectedData[0].length;
-  const outRows = rows - 2;
-  const outCols = cols - 2;
+  const filterSize = 3;
+  const outRows = Math.floor((rows - filterSize) / stride) + 1;
+  const outCols = Math.floor((cols - filterSize) / stride) + 1;
   const maxSteps = outRows * outCols;
 
-  // Pre-calculate the entire output grid so we don't recalculate everything on each render
+  // Pre-calculate the entire output grid
   const outputGrid = useMemo(() => {
     const grid = [];
     for (let r = 0; r < outRows; r++) {
       const row = [];
       for (let c = 0; c < outCols; c++) {
         let sum = 0;
-        for (let i = 0; i < 3; i++) {
-          for (let j = 0; j < 3; j++) {
-            sum += selectedData[r + i][c + j] * selectedFilter[i][j];
+        const startR = r * stride;
+        const startC = c * stride;
+        for (let i = 0; i < filterSize; i++) {
+          for (let j = 0; j < filterSize; j++) {
+            sum += selectedData[startR + i][startC + j] * selectedFilter[i][j];
           }
         }
         row.push(sum);
@@ -50,7 +76,7 @@ function App() {
       grid.push(row);
     }
     return grid;
-  }, [selectedData, selectedFilter]);
+  }, [selectedData, selectedFilter, outRows, outCols, stride]);
 
   useEffect(() => {
     let interval = null;
@@ -63,18 +89,18 @@ function App() {
           }
           return prev + 1;
         });
-      }, 50); // 50ms per step = 20 steps per second
+      }, 50);
     } else {
       clearInterval(interval);
     }
     return () => clearInterval(interval);
   }, [isPlaying, maxSteps]);
 
-  // Reset when data or filter changes
+  // Reset when data, filter, stride, or padding changes
   useEffect(() => {
     setCurrentStep(0);
     setIsPlaying(false);
-  }, [selectedDatasetId, selectedFilterId]);
+  }, [selectedDatasetId, selectedFilterId, stride, padding]);
 
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
@@ -96,15 +122,15 @@ function App() {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  const windowRow = Math.floor(currentStep / outCols);
-  const windowCol = currentStep % outCols;
+  const windowRow = Math.floor(currentStep / outCols) * stride;
+  const windowCol = (currentStep % outCols) * stride;
 
   // Extract the current 3x3 input window
   const inputWindow = useMemo(() => {
     const win = [];
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < filterSize; i++) {
       const row = [];
-      for (let j = 0; j < 3; j++) {
+      for (let j = 0; j < filterSize; j++) {
         if (windowRow + i < rows && windowCol + j < cols) {
           row.push(selectedData[windowRow + i][windowCol + j]);
         } else {
@@ -114,9 +140,9 @@ function App() {
       win.push(row);
     }
     return win;
-  }, [selectedData, windowRow, windowCol, rows, cols]);
+  }, [selectedData, windowRow, windowCol, rows, cols, filterSize]);
 
-  const currentOutputValue = currentStep < maxSteps ? outputGrid[windowRow][windowCol] : null;
+  const currentOutputValue = currentStep < maxSteps ? outputGrid[Math.floor(currentStep / outCols)][currentStep % outCols] : null;
 
   return (
     <div className="app-container" ref={appRef} style={{ background: isFullScreen ? 'var(--bg-color)' : '' }}>
@@ -129,6 +155,10 @@ function App() {
         setSelectedDatasetId={setSelectedDatasetId}
         selectedFilterId={selectedFilterId}
         setSelectedFilterId={setSelectedFilterId}
+        stride={stride}
+        setStride={setStride}
+        padding={padding}
+        setPadding={setPadding}
         isPlaying={isPlaying}
         togglePlay={() => setIsPlaying(!isPlaying)}
         stepForward={() => {
@@ -149,6 +179,9 @@ function App() {
           currentStep={currentStep} 
           hoveredCell={hoveredCell}
           setHoveredCell={setHoveredCell}
+          stride={stride}
+          outCols={outCols}
+          paddingAmount={paddingAmount}
         />
         
         <CalculationDisplay 
