@@ -28,12 +28,13 @@
 }
 
 body {
-  background-color: var(--bg-color);
+  background: radial-gradient(circle at 50% -20%, #1e293b, var(--bg-color) 70%);
   color: var(--text-main);
   font-family: var(--font-sans);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-attachment: fixed;
 }
 
 #root {
@@ -131,16 +132,34 @@ select:focus {
 
 .header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-color), transparent);
+  opacity: 0.5;
 }
 
 .title {
-  font-size: 1.5rem;
-  background: linear-gradient(to right, #60a5fa, #a78bfa);
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #c084fc, #f472b6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-align: center;
+  letter-spacing: -0.05em;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .controls-bar {
