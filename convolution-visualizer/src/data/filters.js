@@ -1,7 +1,8 @@
 export const filters = [
   {
     id: 'top_edge',
-    name: 'Top Edge',
+    name: 'Edge - Top',
+    category: 'Edge',
     data: [
       [ 1,  1,  1],
       [ 0,  0,  0],
@@ -10,7 +11,8 @@ export const filters = [
   },
   {
     id: 'bottom_edge',
-    name: 'Bottom Edge',
+    name: 'Edge - Bottom',
+    category: 'Edge',
     data: [
       [-1, -1, -1],
       [ 0,  0,  0],
@@ -19,7 +21,8 @@ export const filters = [
   },
   {
     id: 'left_edge',
-    name: 'Left Edge',
+    name: 'Edge - Left',
+    category: 'Edge',
     data: [
       [ 1,  0, -1],
       [ 1,  0, -1],
@@ -28,7 +31,8 @@ export const filters = [
   },
   {
     id: 'right_edge',
-    name: 'Right Edge',
+    name: 'Edge - Right',
+    category: 'Edge',
     data: [
       [-1,  0,  1],
       [-1,  0,  1],
@@ -37,7 +41,8 @@ export const filters = [
   },
   {
     id: 'prewitt_top',
-    name: 'Prewitt Top',
+    name: 'Prewitt - Top',
+    category: 'Prewitt',
     data: [
       [ 1,  1,  1],
       [ 0,  0,  0],
@@ -46,7 +51,8 @@ export const filters = [
   },
   {
     id: 'prewitt_bottom',
-    name: 'Prewitt Bottom',
+    name: 'Prewitt - Bottom',
+    category: 'Prewitt',
     data: [
       [-1, -1, -1],
       [ 0,  0,  0],
@@ -55,7 +61,8 @@ export const filters = [
   },
   {
     id: 'prewitt_left',
-    name: 'Prewitt Left',
+    name: 'Prewitt - Left',
+    category: 'Prewitt',
     data: [
       [ 1,  0, -1],
       [ 1,  0, -1],
@@ -64,7 +71,8 @@ export const filters = [
   },
   {
     id: 'prewitt_right',
-    name: 'Prewitt Right',
+    name: 'Prewitt - Right',
+    category: 'Prewitt',
     data: [
       [-1,  0,  1],
       [-1,  0,  1],
@@ -73,7 +81,8 @@ export const filters = [
   },
   {
     id: 'sobel_top',
-    name: 'Sobel Top',
+    name: 'Sobel - Top',
+    category: 'Sobel',
     data: [
       [ 1,  2,  1],
       [ 0,  0,  0],
@@ -82,7 +91,8 @@ export const filters = [
   },
   {
     id: 'sobel_bottom',
-    name: 'Sobel Bottom',
+    name: 'Sobel - Bottom',
+    category: 'Sobel',
     data: [
       [-1, -2, -1],
       [ 0,  0,  0],
@@ -91,7 +101,8 @@ export const filters = [
   },
   {
     id: 'sobel_left',
-    name: 'Sobel Left',
+    name: 'Sobel - Left',
+    category: 'Sobel',
     data: [
       [ 1,  0, -1],
       [ 2,  0, -2],
@@ -100,11 +111,52 @@ export const filters = [
   },
   {
     id: 'sobel_right',
-    name: 'Sobel Right',
+    name: 'Sobel - Right',
+    category: 'Sobel',
     data: [
       [-1,  0,  1],
       [-2,  0,  2],
       [-1,  0,  1]
+    ]
+  },
+  {
+    id: 'laplacian',
+    name: 'Laplacian',
+    category: 'Laplacian',
+    data: [
+      [ 0,  1,  0],
+      [ 1, -4,  1],
+      [ 0,  1,  0]
+    ]
+  },
+  {
+    id: 'sharpen',
+    name: 'Sharpen',
+    category: 'Other',
+    data: [
+      [ 0, -1,  0],
+      [-1,  5, -1],
+      [ 0, -1,  0]
+    ]
+  },
+  {
+    id: 'blur',
+    name: 'Box Blur',
+    category: 'Other',
+    data: [
+      [1/9, 1/9, 1/9],
+      [1/9, 1/9, 1/9],
+      [1/9, 1/9, 1/9]
+    ]
+  },
+  {
+    id: 'identity',
+    name: 'Identity',
+    category: 'Other',
+    data: [
+      [ 0,  0,  0],
+      [ 0,  1,  0],
+      [ 0,  0,  0]
     ]
   }
 ];
