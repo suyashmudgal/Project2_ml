@@ -169,7 +169,7 @@ function App() {
           Home
         </Link>
         <h1>CNN Convolution Visualizer</h1>
-        <p>Interactive visualization of convolution, pooling &amp; transposed convolution</p>
+        <p>Interactive visualization of convolution, pooling & transposed convolution</p>
         <div className="header-line" />
       </header>
 

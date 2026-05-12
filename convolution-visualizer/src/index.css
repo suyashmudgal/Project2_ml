@@ -108,6 +108,30 @@ body {
   opacity: 0.4;
 }
 
+/* Back to Home link */
+.back-home-link {
+  position: absolute;
+  top: 1rem;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+}
+
+.back-home-link:hover {
+  color: var(--text-primary);
+  border-color: var(--border-default);
+  background: var(--bg-card);
+}
+
 /* ===== CONTROL PANEL ===== */
 .controls-panel {
   background: var(--bg-card);
