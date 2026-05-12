@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import Controls from './components/Controls';
 import InputGrid from './components/InputGrid';
 import OutputGrid from './components/OutputGrid';
@@ -161,8 +162,14 @@ function App() {
     <div className="app">
       {/* Header */}
       <header className="app-header">
+        <Link to="/" className="back-home-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+          </svg>
+          Home
+        </Link>
         <h1>CNN Convolution Visualizer</h1>
-        <p>Interactive visualization of convolution, pooling & transposed convolution</p>
+        <p>Interactive visualization of convolution, pooling &amp; transposed convolution</p>
         <div className="header-line" />
       </header>
 
